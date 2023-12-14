@@ -2,8 +2,14 @@ import json
 from functools import cache
 
 import js
-from pyodide import create_proxy
+from pyodide.ffi import create_proxy
 from pyodide.http import open_url
+
+environments = {
+    "Development": "https://api.development.sinopia.io/",
+    "Stage": "https://api.stage.sinopia.io/",
+    "Production": "https://api.sinopia.io/",
+}
 
 
 def _generate_url(event):
@@ -61,7 +67,8 @@ def _environment_checkbox(env):
     div.appendChild(label)
     return div
 
-def _group_select(options: list=[]):
+
+def _group_select(options: list = []):
     wrapper_div = js.document.createElement("div")
     wrapper_div.classList.add("col")
     select = js.document.createElement("select")
@@ -73,8 +80,26 @@ def _group_select(options: list=[]):
     return wrapper_div
 
 
+async def show_groups(env):
+    api_url = environments.get(env)
+    if api_url is None:
+        return
+    group_select = js.document.getElementById("env-groups")
+    groups_url = f"{api_url}groups/"
+    result = open_url(groups_url)
+    data = json.loads(result.getvalue())["data"]
+    groups = [("All", "all")]
+    for row in data:
+        groups.append((row["label"], row["id"]))
+    groups = sorted(groups, key=lambda y: y[0])
+    for group in groups:
+        option = js.document.createElement("option")
+        option.setAttribute("value", group[1])
+        option.innerText = group[0]
+        group_select.appendChild(option)
 
-def sinopia_api(widget_div):
+
+async def sinopia_api(widget_div):
     widget_div.element.classList.add("row")
     env_column = js.document.createElement("div")
     env_column.classList.add("col")
@@ -86,10 +111,9 @@ def sinopia_api(widget_div):
     ]:
         env_checkbox = _environment_checkbox(env)
         env_column.appendChild(env_checkbox)
-        
+
     widget_div.element.appendChild(env_column)
     widget_div.element.appendChild(_group_select())
-    output_div = js.document.createElement("div")
-    output_div.setAttribute("id", "sinopia-group-url")
-    widget_div.element.appendChild(output_div)
-
+    # await output_div = js.document.createElement("div")
+    # output_div.setAttribute("id", "sinopia-group-url")
+    # widget_div.element.appendChild(output_div)
