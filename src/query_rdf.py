@@ -41,4 +41,4 @@ async def run_query():
             vars=query.vars, results=query.bindings
         )
     except Exception as e:
-        output_element.innerHTML = f"""<h2>Query Error</h2><p>{{ e }}</p>"""
+        output_element.innerHTML = f"""<h2>Query Error</h2><p>{e}</p>"""
