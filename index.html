@@ -19,7 +19,7 @@
 
      [[fetch]]
      from = "src"
-     files = ["helpers.py", "load_rdf.py", "sinopia_api.py"]
+     files = ["helpers.py", "load_rdf.py", "query_rdf.py", "sinopia_api.py"]
 
     </py-config>
     <py-script>
@@ -41,6 +41,7 @@
 
       from sinopia_api import show_groups
       from load_rdf import bibframe_sparql as bf_sparql_widget, build_graph
+      from query_rdf import run_query
  
 
 
@@ -52,22 +53,6 @@
           ]:
               await helpers.render_markdown(element_id)
 
-      async def run_query():
-          query_element = js.document.getElementById("bf-sparql-queries")
-          sparql_query = query_element.value
-          output_element = js.document.getElementById("bf-sparql-results")
-          output_element.innerHTML = ""
-          output_table = js.document.createElement("table")
-          output_table.classList.add("table")
-          for row in helpers.sinopia_graph.query(sparql_query):
-              tr = js.document.createElement("tr")
-              for node in row:
-                  td = js.document.createElement("td")
-                  td.innerHTML = str(node)
-                  tr.appendChild(td)
-              output_table.appendChild(tr)
-          output_element.appendChild(output_table)
-              
 
       asyncio.ensure_future(load_content())
       #asyncio.ensure_future(sinopia_env_widget(Element("sinopia-api-group-widget")))
