@@ -40,8 +40,10 @@ def _on_load_groups(event):
     group_url_div = js.document.querySelector("#sinopia-group-url")
     group_url_div.innerHTML = ""
     group_select = js.document.querySelector("#env-groups")
-    group_select.innerHTML = ""
+    while group_select.options.length > 0:
+        group_select.remove(0)
     groups = _get_groups(event.target.id)
+    js.console.log(f"Size of groups {len(groups)}")
     for group in groups:
         option = js.document.createElement("option")
         option.setAttribute("value", group[1])
@@ -85,6 +87,8 @@ async def show_groups(env):
     if api_url is None:
         return
     group_select = js.document.getElementById("env-groups")
+    while group_select.options.length > 0:
+        group_select.remove(0)
     groups_url = f"{api_url}groups/"
     result = open_url(groups_url)
     data = json.loads(result.getvalue())["data"]
