@@ -125,12 +125,12 @@ def bibframe(element_id: str, urls: list):
 sparql_template = Template(
     """<div class="mb-3">
     <label for="bf-sparql-queries" class="form-label">SPARQL Query</label>
-    <textarea class="form-control" id="bf-sparql-queries" row="10">
-     {% for ns in namespaces %}PREFIX {{ ns[0] }}: <{{ ns[1] }}>\n{% endfor %}
+    <textarea class="form-control" id="bf-sparql-queries" rows="10">
+    {% for ns in namespaces %}PREFIX {{ ns[0] }}: <{{ ns[1] }}>\n{% endfor %}
     </textarea>
   </div>
   <div class="mb-3">
-    <button class="btn btn-primary">Run query</button>
+    <button class="btn btn-primary" py-click="asyncio.ensure_future(run_query())">Run query</button>
   </div>
 </div>"""
 )
@@ -138,4 +138,6 @@ sparql_template = Template(
 
 def bibframe_sparql(element_id: str):
     wrapper_div = js.document.getElementById(element_id)
-    wrapper_div.innerHTML = sparql_template.render(namespaces=NAMESPACES)
+    all_namespaces = NAMESPACES + [("rdf", rdflib.RDF), ("rdfs", rdflib.RDFS)]
+    js.console.log(f"All namespaces {all_namespaces}")
+    wrapper_div.innerHTML = sparql_template.render(namespaces=all_namespaces)
