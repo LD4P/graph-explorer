@@ -6,7 +6,7 @@ from jinja2 import Template
 
 query_results_template = Template(
     """
-<h2>Query Results</h2>
+<h2>Query Results {{count}} Rows</h2>
 <table class="table">          
   <thead>
     <tr>
@@ -36,9 +36,8 @@ async def run_query():
     output_element.innerHTML = ""
     try:
         query = helpers.sinopia_graph.query(sparql_query)
-
         output_element.innerHTML = query_results_template.render(
-            vars=query.vars, results=query.bindings
+            count=f"{len(query.bindings):,}", vars=query.vars, results=query.bindings
         )
     except Exception as e:
         output_element.innerHTML = f"""<h2>Query Error</h2><p>{e}</p>"""
