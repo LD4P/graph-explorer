@@ -7,7 +7,7 @@ from jinja2 import Template
 from pyodide.ffi import create_proxy
 from pyodide.http import pyfetch
 
-from helpers import NAMESPACES, sinopia_graph
+from state import NAMESPACES, SINOPIA_GRAPH
 from sinopia_api import environments
 
 
@@ -20,14 +20,17 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> list
     initial_result = await pyfetch(initial_url)
     group_payload = await initial_result.json()
     for row in group_payload["data"]:
-        sinopia_graph.parse(data=json.dumps(row["data"]), format="json-ld")
-    js.console.log(f"Total size of graph {len(sinopia_graph)} triples")
+        SINOPIA_GRAPH.parse(data=json.dumps(row["data"]), format="json-ld")
+    js.console.log(f"Total size of graph {len(SINOPIA_GRAPH)} triples")
     return
 
 
 async def build_graph() -> rdflib.Graph:
     groups_selected = js.document.getElementById("env-groups")
+    individual_resources = js.document.getElementById("resource-urls")
     sinopia_env_radio = js.document.getElementsByName("sinopia_env")
+    loading_spinner = js.document.getElementById("graph-loading-status")
+    loading_spinner.classList.remove("d-none")
     sinopia_api_url = None
     for elem in sinopia_env_radio:
         if elem.checked:
@@ -36,8 +39,16 @@ async def build_graph() -> rdflib.Graph:
     for option in groups_selected.selectedOptions:
         await _get_group_graph(option.value, sinopia_api_url)
 
-    js.console.log(f"Sinopia graph size {len(sinopia_graph)}")
-    _summarize_graph(sinopia_graph)
+    if len(individual_resources.value) > 0:
+        resources = individual_resources.value.split(",")
+        for resource_url in resources:
+            resource_result = await pyfetch(resource_url)
+            resource_payload = await resource_result.json()
+            for row in resource_payload["data"]:
+                SINOPIA_GRAPH.parse(data=json.dumps(row), format="json-ld")
+    loading_spinner.classList.add("d-none")
+    js.console.log(f"Sinopia graph size {len(SINOPIA_GRAPH)}")
+    _summarize_graph(SINOPIA_GRAPH)
 
 
 bf_summary_template = Template(
@@ -77,15 +88,50 @@ bf_summary_template = Template(
       Download Graph
     </button>
     <ul class="dropdown-menu" aria-labelledby="rdf-download-file">
-        <li><a class="dropdown-item" href="#">Turtle (.ttl)</a></li>
-        <li><a class="dropdown-item" href="#">XML (.rdf)</a></li>
-        <li><a class="dropdown-item" href="#">JSON-LD (.json)</a></li>
-         <li><a class="dropdown-item" href="#">N3 (.nt)</a></li>
+        <li><a py-click="asyncio.ensure_future(download_graph('ttl'))" class="dropdown-item" href="#">Turtle (.ttl)</a></li>
+        <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_graph('xml'))" href="#">XML (.rdf)</a></li>
+        <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_graph('json-ld'))" href="#">JSON-LD (.json)</a></li>
+         <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_graph('nt'))" href="#">N3 (.nt)</a></li>
     </ul>
   </div>
 </div>
 """
 )
+
+
+async def download_graph(serialization: str):
+    if len(SINOPIA_GRAPH) < 1:
+        js.alert("Empty graph cannot be download")
+        return
+
+    mime_type, contents = None, None
+    match serialization:
+        case "json-ld":
+            mime_type = "application/json"
+            contents = SINOPIA_GRAPH.serialize(format="json-ld")
+
+        case "nt":
+            mime_type = "application/n-triples"
+            contents = SINOPIA_GRAPH.serialize(format="nt")
+
+        case "ttl":
+            mime_type = "application/x-turtle"
+            contents = SINOPIA_GRAPH.serialize(format="turtle")
+
+        case "xml":
+            mime_type = "application/rdf+xml"
+            contents = SINOPIA_GRAPH.serialize(format="pretty-xml")
+
+        case _:
+            js.alert(f"Unknown RDF serialization {serialization}")
+            return
+    blob = js.Blob.new([contents], {"type": mime_type})
+    anchor = js.document.createElement("a")
+    anchor.href = js.URL.createObjectURL(blob)
+    anchor.download = f"sinopia-graph.{serialization}"
+    js.document.body.appendChild(anchor)
+    anchor.click()
+    js.document.body.removeChild(anchor)
 
 
 def _summarize_graph(graph: rdflib.Graph):

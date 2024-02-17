@@ -1,18 +1,14 @@
 import js
 import markdown
-import rdflib
 
 from js import document
 
-NAMESPACES = [
-    ("bf", "http://id.loc.gov/ontologies/bibframe/"),
-    ("sinopia", "http://sinopia.io/vocabulary/"),
-]
 
-sinopia_graph = rdflib.Graph()
-
-for ns in NAMESPACES:
-    sinopia_graph.namespace_manager.bind(ns[0], ns[1])
+def set_versions(version):
+    version_element = document.getElementById("version")
+    footer_version = document.getElementById("footer-version")
+    version_element.innerHTML = version
+    footer_version.innerHTML = version
 
 
 async def render_markdown(element_id):
