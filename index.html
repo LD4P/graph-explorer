@@ -19,10 +19,11 @@
 
      [[fetch]]
      from = "src"
-     files = ["helpers.py", "load_rdf.py", "query_rdf.py", "sinopia_api.py"]
+     files = ["helpers.py", "load_rdf.py", "query_rdf.py", "sinopia_api.py", "state.py"]
 
     </py-config>
     <py-script>
+      __version__ = "0.1.0"
       import asyncio
       import sys
       import js
@@ -40,8 +41,8 @@
       SINOPIA = rdflib.Namespace("http://sinopia.io/vocabulary/")
 
       from sinopia_api import show_groups
-      from load_rdf import bibframe_sparql as bf_sparql_widget, build_graph
-      from query_rdf import run_query
+      from load_rdf import bibframe_sparql as bf_sparql_widget, build_graph, download_graph
+      from query_rdf import download_query_results, run_query
  
 
 
@@ -55,22 +56,18 @@
 
 
       asyncio.ensure_future(load_content())
-      #asyncio.ensure_future(sinopia_env_widget(Element("sinopia-api-group-widget")))
-      entities = [ 
-        "https://api.stage.sinopia.io/resource/6861fc10-0213-4dfc-b1a0-7df975d235dd",
-        "https://api.stage.sinopia.io/resource/986d673d-f006-44ab-8bf7-b92b279fddfa",
-        "https://api.stage.sinopia.io/resource/16061ffa-147a-4b67-9a12-0990964f32d4"
-      ]
-      #bibframe_widget("bibframe-widget", entities)
-      bf_sparql_widget("bf-sparql-query")
       
+      bf_sparql_widget("bf-sparql-query")
+     
+      helpers.set_versions(__version__)
+       
      </py-script>
   </head>
   <body>
     <div class="editor-navbar">
        <h3>Linked-Data for Production</h3>
        <h1>Graph Explorer with Sinopia Linked Data</h1>
-       <h4>Version 0.0.2</h4>
+       <h4>Version <span id="version" ></span></h4>
     </div>
     <div class="float-end sticky-top">
       <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#graph-repl-modal">
@@ -134,7 +131,10 @@ Environments and Groups
                      <label for="https://api.sinopia.io/" class="form-check-label">Production</label>
                    </input>
                 </div>
-                <button class="btn btn-primary btn-lg" py-click="asyncio.ensure_future(build_graph())">Build Graph</button>
+                <button class="btn btn-primary btn-lg" py-click="asyncio.ensure_future(build_graph())">
+                     <i class="spinner-border d-none" id="graph-loading-status"></i>
+                   Build Graph
+                </button>
               </div>
               <div class="col">
                  <h4>Groups</h4>
@@ -145,7 +145,7 @@ Environments and Groups
                     </select>
                  </div>
                  <h4>Individual Resources</h4>
-                 <p>Add URLs to Individual Resources to add to Graph</p>
+                 <p>Add URLs to Individual Resources to add to Graph (separate by commas)</p>
                  <div>
                    <textarea class="form-control" cols=25 rows=10 id="resource-urls"></textarea>
                  </div>
@@ -186,6 +186,17 @@ along with their properties.
         </div>
        </div>
     </div>
+
+    <footer>
+      <p xmlns:cc="http://creativecommons.org/ns#" >
+        Version <span id="footer-version"></span>. Documentation is licensed under 
+        <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" 
+           target="_blank" 
+           rel="license noopener noreferrer" style="display:inline-block;">Creative Commons Attribution 4.0 International</a>.
+        Source code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2</a> and available 
+        at <a href="https://github.com/LD4P/graph-explorer">https://github.com/LD4P/graph-explorer</a>
+     </p> 
+    </footer>
  
     <div class="modal fade" id="graph-repl-modal" tabindex="-1" aria-labelledby="graph-repl-modal-title" style="display: none;" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
