@@ -11,8 +11,14 @@ from state import NAMESPACES, SINOPIA_GRAPH
 from sinopia_api import environments
 
 
+def skolemize_resource(resource_url: str, raw_rdf: str) -> str:
+    resource_graph = rdflib.Graph()
+    resource_graph.parse(data=json.dumps(raw_rdf), format="json-ld")
+    skolemize_graph = resource_graph.skolemize(basepath=f"{resource_url.strip()}#")
+    return skolemize_graph.serialize(format="turtle")
+
+
 async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> list:
-    urls = []
     start = 0
     if not api_url.endswith("/"):
         api_url = f"{api_url}/"
@@ -20,7 +26,8 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> list
     initial_result = await pyfetch(initial_url)
     group_payload = await initial_result.json()
     for row in group_payload["data"]:
-        SINOPIA_GRAPH.parse(data=json.dumps(row["data"]), format="json-ld")
+        turtle_rdf = skolemize_resource(row["uri"], row["data"])
+        SINOPIA_GRAPH.parse(data=turtle_rdf, format="turtle")
     js.console.log(f"Total size of graph {len(SINOPIA_GRAPH)} triples")
     return
 
@@ -44,8 +51,12 @@ async def build_graph() -> rdflib.Graph:
         for resource_url in resources:
             resource_result = await pyfetch(resource_url)
             resource_payload = await resource_result.json()
-            for row in resource_payload["data"]:
-                SINOPIA_GRAPH.parse(data=json.dumps(row), format="json-ld")
+            converted_graph = skolemize_resource(
+                resource_url.strip(), resource_payload["data"]
+            )
+            SINOPIA_GRAPH.parse(
+                data=converted_graph.serialize(format="turtle"), format="turtle"
+            )
     loading_spinner.classList.add("d-none")
     js.console.log(f"Sinopia graph size {len(SINOPIA_GRAPH)}")
     _summarize_graph(SINOPIA_GRAPH)
