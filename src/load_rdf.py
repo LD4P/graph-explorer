@@ -51,11 +51,11 @@ async def build_graph() -> rdflib.Graph:
         for resource_url in resources:
             resource_result = await pyfetch(resource_url)
             resource_payload = await resource_result.json()
-            converted_graph = skolemize_resource(
+            turtle_rdf = skolemize_resource(
                 resource_url.strip(), resource_payload["data"]
             )
             SINOPIA_GRAPH.parse(
-                data=converted_graph.serialize(format="turtle"), format="turtle"
+                data=turtle_rdf, format="turtle"
             )
     loading_spinner.classList.add("d-none")
     js.console.log(f"Sinopia graph size {len(SINOPIA_GRAPH)}")
