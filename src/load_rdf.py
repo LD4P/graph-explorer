@@ -18,7 +18,27 @@ def skolemize_resource(resource_url: str, raw_rdf: str) -> str:
     return skolemize_graph.serialize(format="turtle")
 
 
-async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> list:
+async def _get_all_graph(api_url: str, limit: int = 250) -> None:
+    next_url = f"{api_url}resource?limit={limit}"
+    loading_resources = True
+    js.console.log("Starting load of all resources")
+    while loading_resources:
+        result = await pyfetch(next_url)
+        payload = await result.json()
+        for row in payload["data"]:
+            if not "data" in row:
+                continue
+            try:
+                turtle_rdf = skolemize_resource(row["uri"], row["data"])
+                SINOPIA_GRAPH.parse(data=turtle_rdf, format="turtle")
+            except Exception as e:
+                js.console.log(f"Failed to parse {row['uri']} {e}")
+        next_url = payload["links"].get("next")
+        if next_url is None:
+            loading_resources = False
+
+
+async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> None:
     start = 0
     if not api_url.endswith("/"):
         api_url = f"{api_url}/"
@@ -44,6 +64,9 @@ async def build_graph() -> rdflib.Graph:
             sinopia_api_url = environments.get(elem.value)
 
     for option in groups_selected.selectedOptions:
+        if option.value == "all":
+            await _get_all_graph(sinopia_api_url)
+            break
         await _get_group_graph(option.value, sinopia_api_url)
 
     if len(individual_resources.value) > 0:
