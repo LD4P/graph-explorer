@@ -23,7 +23,7 @@
 
     </py-config>
     <py-script>
-      __version__ = "0.1.2"
+      __version__ = "1.0.0"
       import asyncio
       import sys
       import js
@@ -89,11 +89,11 @@
         <button class="nav-link" 
                 id="bibframe-tab" 
                 data-bs-toggle="tab" 
-                data-bs-target="#bibframe" 
+                data-bs-target="#graph-summary" 
                 type="button" 
                 role="tab" 
                 aria-controls="profile" 
-                aria-selected="false">BIBFRAME</button>
+                aria-selected="false">Graph Summary</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" 
@@ -153,13 +153,12 @@ Environments and Groups
            </div>
          </div>
       </div>
-      <div class="tab-pane fade" id="bibframe" role="tabpanel" aria-labelledby="profile-tab">
+      <div class="tab-pane fade" id="graph-summary" role="tabpanel" aria-labelledby="profile-tab">
          <div class="container">
            <div id="bf-work-instance-item-rdf">
-## PCC BIBFRAME Work-Instance-Item Graph
-We can use [Sinopia API](https://github.com/ld4p/sinopia_api) to construct a small 
-RDF graph made up of a [BIBFRAME](https://bibframe.org/) Work, Instance, and Item 
-and then create a knowledge graph for analysis and visualization of the entities 
+## Graph Summary
+The [Sinopia API](https://github.com/ld4p/sinopia_api) is used to construct a small 
+RDF graph and then create a knowledge graph for analysis and visualization of the entities 
 along with their properties.
            </div>
           <div class="row">
