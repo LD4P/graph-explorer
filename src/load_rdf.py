@@ -46,8 +46,15 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> None
     initial_result = await pyfetch(initial_url)
     group_payload = await initial_result.json()
     for row in group_payload["data"]:
-        turtle_rdf = skolemize_resource(row["uri"], row["data"])
-        SINOPIA_GRAPH.parse(data=turtle_rdf, format="turtle")
+        if not "data" in row:
+            js.console.log(f"No RDF found for {row.get('uri', 'bad url')}")
+            continue
+        try:
+            turtle_rdf = skolemize_resource(row["uri"], row["data"])
+            SINOPIA_GRAPH.parse(data=turtle_rdf, format="turtle")
+        except Exception as e:
+            js.console.log(f"Cannot load {row['uri']} Error:\n{e}")
+            continue
     js.console.log(f"Total size of graph {len(SINOPIA_GRAPH)} triples")
     return
 
