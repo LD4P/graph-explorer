@@ -15,7 +15,7 @@
       }
     </style>
     <py-config type="toml">
-     packages = ["pandas", "markdown", "Jinja2", "./static/wheels/rdflib-6.1.1-py3-none-any.whl"]
+     packages = ["pandas", "markdown", "Jinja2", "./static/wheels/rdflib-7.0.0-py3-none-any.whl"]
 
      [[fetch]]
      from = "src"
@@ -28,7 +28,7 @@
       import sys
       import js
       # Hack to load rdflib
-      setattr(sys.stderr, 'isatty', lambda : True)
+      # setattr(sys.stderr, 'isatty', lambda : True)
 
       from pyodide.ffi import create_proxy
  
