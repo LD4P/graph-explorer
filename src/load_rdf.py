@@ -66,6 +66,9 @@ async def build_graph() -> rdflib.Graph:
     loading_spinner = js.document.getElementById("graph-loading-status")
     loading_spinner.classList.remove("d-none")
     sinopia_api_url = None
+    SINOPIA_GRAPH = rdflib.Graph()
+
+    js.console.log(f"Starting SINOPIA_GRAPH size {len(SINOPIA_GRAPH)}")
     for elem in sinopia_env_radio:
         if elem.checked:
             sinopia_api_url = environments.get(elem.value)
@@ -144,7 +147,8 @@ async def download_graph(serialization: str):
     if len(SINOPIA_GRAPH) < 1:
         js.alert("Empty graph cannot be download")
         return
-
+    for prefix, uri in NAMESPACES:
+        SINOPIA_GRAPH.namespace_manager.bind(prefix, uri)
     mime_type, contents = None, None
     match serialization:
         case "json-ld":

@@ -2,6 +2,7 @@ import rdflib
 
 NAMESPACES = [
     ("bf", "http://id.loc.gov/ontologies/bibframe/"),
+    ("bflc", "http://id.loc.gov/ontologies/bflc/"),
     ("sinopia", "http://sinopia.io/vocabulary/"),
 ]
 
