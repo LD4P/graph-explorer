@@ -55,8 +55,7 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> None
         except Exception as e:
             js.console.log(f"Cannot load {row['uri']} Error:\n{e}")
             continue
-    js.console.log(f"Total size of graph {len(SINOPIA_GRAPH)} triples")
-    return
+    return SINOPIA_GRAPH
 
 
 async def build_graph() -> rdflib.Graph:
@@ -68,7 +67,6 @@ async def build_graph() -> rdflib.Graph:
     sinopia_api_url = None
     SINOPIA_GRAPH = rdflib.Graph()
 
-    js.console.log(f"Starting SINOPIA_GRAPH size {len(SINOPIA_GRAPH)}")
     for elem in sinopia_env_radio:
         if elem.checked:
             sinopia_api_url = environments.get(elem.value)
@@ -77,7 +75,7 @@ async def build_graph() -> rdflib.Graph:
         if option.value == "all":
             await _get_all_graph(sinopia_api_url)
             break
-        await _get_group_graph(option.value, sinopia_api_url)
+        SINOPIA_GRAPH = await _get_group_graph(option.value, sinopia_api_url)
 
     if len(individual_resources.value) > 0:
         resources = individual_resources.value.split(",")
@@ -87,11 +85,8 @@ async def build_graph() -> rdflib.Graph:
             turtle_rdf = skolemize_resource(
                 resource_url.strip(), resource_payload["data"]
             )
-            SINOPIA_GRAPH.parse(
-                data=turtle_rdf, format="turtle"
-            )
+            SINOPIA_GRAPH.parse(data=turtle_rdf, format="turtle")
     loading_spinner.classList.add("d-none")
-    js.console.log(f"Sinopia graph size {len(SINOPIA_GRAPH)}")
     _summarize_graph(SINOPIA_GRAPH)
 
 
