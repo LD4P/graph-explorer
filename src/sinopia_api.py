@@ -3,7 +3,7 @@ from functools import cache
 
 import js
 from pyodide.ffi import create_proxy
-from pyodide.http import open_url
+from pyodide.http import pyfetch
 
 environments = {
     "Development": "https://api.development.sinopia.io/",
@@ -26,17 +26,18 @@ def _generate_url(event):
 
 
 @cache
-def _get_groups(sinopia_api: str):
+async def _get_groups(sinopia_api: str):
     groups_url = f"{sinopia_api}groups/"
-    result = open_url(groups_url)
-    data = json.loads(result.getvalue())["data"]
+    http_result = await pyfetch(groups_url)
+    result = await http_result.json()
+    data = result["data"]
     groups = [("All", "all")]
     for row in data:
         groups.append((row["label"], row["id"]))
     return sorted(groups, key=lambda y: y[0])
 
 
-def _on_load_groups(event):
+async def _on_load_groups(event):
     group_url_div = js.document.querySelector("#sinopia-group-url")
     group_url_div.innerHTML = ""
     group_select = js.document.querySelector("#env-groups")
@@ -90,8 +91,10 @@ async def show_groups(env):
     while group_select.options.length > 0:
         group_select.remove(0)
     groups_url = f"{api_url}groups/"
-    result = open_url(groups_url)
-    data = json.loads(result.getvalue())["data"]
+    get_result = await pyfetch(groups_url)
+    result = await get_result.json()
+    #data = json.loads(result.getvalue())["data"]
+    data = result["data"]
     groups = [("All", "all")]
     for row in data:
         groups.append((row["label"], row["id"]))
