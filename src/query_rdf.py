@@ -23,8 +23,8 @@ query_results_template = Template(
       Download Results
     </button>
     <ul class="dropdown-menu" aria-labelledby="rdf-download-file">
-        <li><a py-click="asyncio.ensure_future(download_query_results('csv'))" class="dropdown-item" href="#">CSV (.csv)</a></li>
-        <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_query_results('json'))" href="#">JSON (.json)</a></li>
+        <li><a py-click="download_query_results" data-serialization='csv' class="dropdown-item" href="#">CSV (.csv)</a></li>
+        <li><a class="dropdown-item" py-click="download_query_results" data-serialization='json' href="#">JSON (.json)</a></li>
     </ul>
   </div>
 </div>
@@ -50,13 +50,14 @@ query_results_template = Template(
 )
 
 
-async def download_query_results(serialization: str):
+async def download_query_results(event):
+    serialization = event.target.getAttribute("data-serialization")
     js.console.log(f"Download query results {serialization} {len(RESULTS_DF)}")
     mime_type, content = None, None
     match serialization:
         case "csv":
             mime_type = "text/csv"
-            contents = RESULTS_DF.to_csv()
+            contents = RESULTS_DF.to_csv(index=False)
 
         case "json":
             mime_type = "application/json"
@@ -74,12 +75,12 @@ async def download_query_results(serialization: str):
     js.document.body.removeChild(anchor)
 
 
-async def run_query():
+async def run_query(*args):
     global RESULTS_DF
     query_element = js.document.getElementById("bf-sparql-queries")
     sparql_query = query_element.value
     output_element = js.document.getElementById("bf-sparql-results")
-    output_element.innerHTML = ""
+    output_element.content = ""
     try:
         query = SINOPIA_GRAPH.query(sparql_query)
         RESULTS_DF = pd.DataFrame(query.bindings)
@@ -87,4 +88,4 @@ async def run_query():
             count=f"{len(query.bindings):,}", vars=query.vars, results=query.bindings
         )
     except Exception as e:
-        output_element.innerHTML = f"""<h2>Query Error</h2><p>{e}</p>"""
+        output_element.content = f"""<h2>Query Error</h2><p>{e}</p>"""

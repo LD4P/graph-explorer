@@ -1,0 +1,17 @@
+{
+  "packages": [
+    "pandas",
+    "markdown",
+    "Jinja2",
+    "pyparsing",
+    "./static/wheels/isodate-0.6.1-py2.py3-none-any.whl",
+    "./static/wheels/rdflib-7.1.1-py3-none-any.whl"
+  ],
+  "files": {
+    "./src/helpers.py": "./helpers.py",
+    "./src/load_rdf.py": "./load_rdf.py",
+    "./src/query_rdf.py": "./query_rdf.py",
+    "./src/sinopia_api.py": "./sinopia_api.py",
+    "./src/state.py": "./state.py"
+  }
+}

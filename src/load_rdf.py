@@ -24,7 +24,7 @@ async def _get_all_graph(api_url: str, limit: int = 250) -> None:
     while loading_resources:
         result = await pyfetch(next_url)
         payload = await result.json()
-        for i,row in enumerate(payload["data"]):
+        for i, row in enumerate(payload["data"]):
             if not "data" in row:
                 js.console.log(f"No data for {i}")
                 continue
@@ -49,7 +49,7 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> None
     initial_url = f"{api_url}resource?limit={limit}&group={group}&start={start}"
     initial_result = await pyfetch(initial_url)
     group_payload = await initial_result.json()
-    for i,row in enumerate(group_payload["data"]):
+    for i, row in enumerate(group_payload["data"]):
         if not "data" in row:
             js.console.log(f"No RDF found for {row.get('uri', 'bad url')}")
             continue
@@ -65,7 +65,7 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> None
     return SINOPIA_GRAPH
 
 
-async def build_graph() -> rdflib.Graph:
+async def build_graph(*args) -> rdflib.Graph:
     groups_selected = js.document.getElementById("env-groups")
     individual_resources = js.document.getElementById("resource-urls")
     sinopia_env_radio = js.document.getElementsByName("sinopia_env")
@@ -134,10 +134,10 @@ bf_summary_template = Template(
       Download Graph
     </button>
     <ul class="dropdown-menu" aria-labelledby="rdf-download-file">
-        <li><a py-click="asyncio.ensure_future(download_graph('ttl'))" class="dropdown-item" href="#">Turtle (.ttl)</a></li>
-        <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_graph('xml'))" href="#">XML (.rdf)</a></li>
-        <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_graph('json-ld'))" href="#">JSON-LD (.json)</a></li>
-         <li><a class="dropdown-item" py-click="asyncio.ensure_future(download_graph('nt'))" href="#">N3 (.nt)</a></li>
+        <li><a py-click="download_graph" data-serialization="ttl" class="dropdown-item" href="#">Turtle (.ttl)</a></li>
+        <li><a class="dropdown-item" py-click="download_graph" data-serialization="xml" href="#">XML (.rdf)</a></li>
+        <li><a class="dropdown-item" py-click="download_graph" data-serialization="json-ld" href="#">JSON-LD (.json)</a></li>
+         <li><a class="dropdown-item" py-click="download_graph" data-serialization="nt" href="#">N3 (.nt)</a></li>
     </ul>
   </div>
 </div>
@@ -145,7 +145,11 @@ bf_summary_template = Template(
 )
 
 
-async def download_graph(serialization: str):
+async def download_graph(event):
+    anchor = event.target
+    serialization = anchor.getAttribute("data-serialization")
+
+    js.console.log(f"In graph, {serialization}")
     if len(SINOPIA_GRAPH) < 1:
         js.alert("Empty graph cannot be download")
         return
@@ -223,7 +227,7 @@ sparql_template = Template(
     </textarea>
   </div>
   <div class="mb-3">
-    <button class="btn btn-primary" py-click="asyncio.ensure_future(run_query())">Run query</button>
+    <button class="btn btn-primary" py-click="run_query">Run query</button>
   </div>
 </div>"""
 )
@@ -232,5 +236,4 @@ sparql_template = Template(
 def bibframe_sparql(element_id: str):
     wrapper_div = js.document.getElementById(element_id)
     all_namespaces = NAMESPACES + [("rdf", rdflib.RDF), ("rdfs", rdflib.RDFS)]
-    js.console.log(f"All namespaces {all_namespaces}")
     wrapper_div.innerHTML = sparql_template.render(namespaces=all_namespaces)
