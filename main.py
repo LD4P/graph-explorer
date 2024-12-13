@@ -33,3 +33,6 @@ asyncio.ensure_future(load_content())
 bf_sparql_widget("bf-sparql-query")
 
 helpers.set_versions(__version__)
+
+splash_modal_close_btn = js.document.getElementById("splashModalCloseBtn")
+splash_modal_close_btn.click()
