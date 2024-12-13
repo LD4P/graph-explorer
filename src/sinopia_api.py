@@ -53,6 +53,7 @@ async def _on_load_groups(event):
 
 
 def _environment_checkbox(env):
+
     div = js.document.createElement("div")
     div.classList.add("form-check")
     ident = env[1]
@@ -83,7 +84,11 @@ def _group_select(options: list = []):
     return wrapper_div
 
 
-async def show_groups(env):
+async def show_groups(*args):
+    current_radio_btn = args[0].target
+    env = current_radio_btn.value
+
+    js.console.log(f"Env is {current_radio_btn.value}")
     api_url = environments.get(env)
     if api_url is None:
         return
@@ -93,7 +98,7 @@ async def show_groups(env):
     groups_url = f"{api_url}groups/"
     get_result = await pyfetch(groups_url)
     result = await get_result.json()
-    #data = json.loads(result.getvalue())["data"]
+    # data = json.loads(result.getvalue())["data"]
     data = result["data"]
     groups = [("All", "all")]
     for row in data:
