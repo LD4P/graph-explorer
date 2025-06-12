@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 589.5 162">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #003caf;
+      }
+
+      .cls-3, .cls-4 {
+        font-family: Roboto-Medium, Roboto;
+        font-weight: 500;
+      }
+
+      .cls-5, .cls-6 {
+        font-family: Roboto-Light, Roboto;
+        font-weight: 300;
+      }
+
+      .cls-2 {
+        font-size: 100px;
+      }
+
+      .cls-7 {
+        fill: #fff;
+      }
+
+      .cls-6 {
+        letter-spacing: -.06em;
+      }
+
+      .cls-4 {
+        letter-spacing: 0em;
+      }
+    </style>
+  </defs>
+  <text class="cls-2" transform="translate(151 115.5)"><tspan class="cls-5" x="0" y="0">Blue</tspan><tspan class="cls-6" x="190.28" y="0"> </tspan><tspan class="cls-3" x="208.6" y="0">Co</tspan><tspan class="cls-4" x="330.82" y="0">r</tspan><tspan class="cls-3" x="365.04" y="0">e</tspan></text>
+  <g>
+    <circle class="cls-1" cx="51.75" cy="110.25" r="29.25"/>
+    <circle class="cls-1" cx="102.94" cy="81" r="29.25"/>
+    <circle class="cls-1" cx="51.75" cy="51.75" r="29.25"/>
+    <path class="cls-7" d="M51.03,81c-2.39,0-4.57-.32-6.59-.89v29.24c0,4.54,3.27,8.21,7.31,8.21s7.31-3.68,7.31-8.21v-29.25c-2.41.57-5.06.9-8.03.9Z"/>
+    <path class="cls-7" d="M77.61,96.27c1.19,2.07,2.01,4.12,2.53,6.15l25.32-14.62c3.93-2.27,5.48-6.94,3.46-10.44-2.02-3.5-6.84-4.49-10.77-2.23l-25.33,14.63c1.7,1.8,3.31,3.93,4.8,6.51Z"/>
+    <path class="cls-7" d="M56.33,46.05c-3.93-2.27-8.75-1.27-10.77,2.23s-.47,8.17,3.46,10.44l25.33,14.63c.71-2.37,1.75-4.84,3.23-7.41,1.19-2.07,2.57-3.8,4.06-5.27l-25.32-14.62Z"/>
+  </g>
+</svg>

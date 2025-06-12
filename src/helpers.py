@@ -1,8 +1,13 @@
 import js
 import markdown
 
-from js import document
+from js import document, console
 
+
+async def bluecore_login(event):
+    console.log(f"Starting Blue Core Login")
+   
+    
 
 def set_versions(version):
     version_element = document.getElementById("version")
@@ -29,3 +34,4 @@ def run_step_01(event):
         output.innerHTML = f"sinopia_urls has ${len(sinopia_stage_urls)}"
     except Exception as e:
         output.innerHTML = f"Error {e} loading {stage_urls.value}"
+ 
