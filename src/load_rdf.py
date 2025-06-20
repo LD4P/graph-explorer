@@ -66,6 +66,8 @@ async def _get_group_graph(group: str, api_url: str, limit: int = 2_500) -> None
 
 
 async def build_graph(*args) -> rdflib.Graph:
+    global SINOPIA_GRAPH
+
     groups_selected = js.document.getElementById("env-groups")
     individual_resources = js.document.getElementById("resource-urls")
     sinopia_env_radio = js.document.getElementsByName("sinopia_env")
@@ -73,7 +75,6 @@ async def build_graph(*args) -> rdflib.Graph:
     loading_spinner.classList.remove("d-none")
 
     sinopia_api_url = None
-    SINOPIA_GRAPH = rdflib.Graph()
 
     for elem in sinopia_env_radio:
         if elem.checked:
@@ -95,6 +96,7 @@ async def build_graph(*args) -> rdflib.Graph:
             SINOPIA_GRAPH.parse(data=turtle_rdf, format="turtle")
     loading_spinner.classList.add("d-none")
     _summarize_graph(SINOPIA_GRAPH)
+    return SINOPIA_GRAPH
 
 
 bf_summary_template = Template(
@@ -149,7 +151,6 @@ async def download_graph(event):
     anchor = event.target
     serialization = anchor.getAttribute("data-serialization")
 
-    js.console.log(f"In graph, {serialization}")
     if len(SINOPIA_GRAPH) < 1:
         js.alert("Empty graph cannot be download")
         return
@@ -223,7 +224,7 @@ sparql_template = Template(
     """<div class="mb-3">
     <label for="bf-sparql-queries" class="form-label">SPARQL Query</label>
     <textarea class="form-control" id="bf-sparql-queries" rows="10">
-    {% for ns in namespaces %}PREFIX {{ ns[0] }}: <{{ ns[1] }}>\n{% endfor %}
+{% for ns in namespaces %}PREFIX {{ ns[0] }}: <{{ ns[1] }}>\n{% endfor %}
     </textarea>
   </div>
   <div class="mb-3">

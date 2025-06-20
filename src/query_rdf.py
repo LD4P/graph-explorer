@@ -77,6 +77,8 @@ async def download_query_results(event):
 
 async def run_query(*args):
     global RESULTS_DF
+    global SINOPIA_GRAPH
+
     query_element = js.document.getElementById("bf-sparql-queries")
     sparql_query = query_element.value
     output_element = js.document.getElementById("bf-sparql-results")
