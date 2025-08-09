@@ -38,13 +38,6 @@ async def _get_keycloak_token():
     global BLUECORE_ENV
 
     username = document.getElementById("user-name")
-    bluecore_env_label = document.getElementById("bluecore-env-label")
-    bluecore_env_radio = document.getElementsByName("bluecore_env")
-    env_label = ""
-    for radio_input in bluecore_env_radio:
-        if radio_input.checked:
-            BLUECORE_ENV = radio_input.value
-    bluecore_env_label.innerHTML = f"for {BLUECORE_ENV}"
     user_element = document.getElementById("keycloak_username")
     keycloak_username = user_element.value
     user_password = document.getElementById("keycloak_password")
@@ -70,7 +63,6 @@ async def _get_keycloak_token():
     except AbortError as e:
         alert(f"Error! {e}")
         return
-    
     
     
 
@@ -150,3 +142,15 @@ async def search_bluecore(event):
         for item in search_result_json.get("items", []):
             alert = _add_search_item(item)
             bench_bc_results.append(alert)
+
+
+async def set_environment(this):
+    global BLUECORE_ENV
+    console.log(this)
+    BLUECORE_ENV = this.target.getAttribute("data-env")
+    bluecore_env_label = document.getElementById("bluecore-env-label")
+    bluecore_env_label.innerHTML = f"for {BLUECORE_ENV}"
+    sessionStorage.removeItem("keycloak_access_token")
+    sessionStorage.removeItem("keycloak_access_expires")
+    sessionStorage.removeItem("keycloak_refresh_token")
+    sessionStorage.removeItem("keycloak_refresh_expires")

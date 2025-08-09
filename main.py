@@ -17,7 +17,7 @@ FILE = pathlib.Path(".")
 
 SINOPIA = rdflib.Namespace("http://sinopia.io/vocabulary/")
 
-from bluecore_api import bluecore_login, save_bluecore, search_bluecore
+from bluecore_api import bluecore_login, save_bluecore, search_bluecore, set_environment
 from sinopia_api import show_groups
 from load_rdf import bibframe_sparql as bf_sparql_widget, build_graph, download_graph, load_cbd_file, load_uri
 from marc import bf2marc, marc2bf

@@ -21,6 +21,16 @@
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Environment
+          </a>
+           <ul class="dropdown-menu">
+            <a class="dropdown-item" href="#" py-click="set_environment" data-env="http://localhost">Local</a>
+            <a class="dropdown-item" href="#" py-click="set_environment" data-env="https://dev.bcld.info">dev.bcld.info</a>
+            <a class="dropdown-item disabled" href="#" py-click="set_environment" data-env="https://bcld.info" aria-disabled="true">bcld.info</a>
+           </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Import
           </a>
           <ul class="dropdown-menu">
